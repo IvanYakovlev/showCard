@@ -13,7 +13,6 @@ public class Templates {
 
         Map<int[][],String> cardList = getList();
 
-
         List<int[][]> keys = new ArrayList<int[][]>(cardList.keySet());
         for(int l = 0; l < keys.size(); l++) {
             int[][]currArr = keys.get(l);

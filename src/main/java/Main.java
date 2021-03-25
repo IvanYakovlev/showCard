@@ -37,6 +37,7 @@ public class Main {
     static int y9=22;
     static int x10=2;
     static int y10=20;
+
     public static void main(String[] args) throws IOException {
         cardsMap.put("0001110100","2");
         cardsMap.put("0110111000","3");
