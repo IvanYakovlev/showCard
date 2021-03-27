@@ -19,32 +19,33 @@ public class Main {
         try (Stream<Path> paths = Files.walk(Paths.get(pathStr))) {
             filesInFolder = paths.filter(Files::isRegularFile).map(Path::toFile).collect(Collectors.toList());
             prop.load(classLoader.getResourceAsStream("config.properties"));
+            int cardHeight=Integer.parseInt((String) prop.get("cardHeight"));
+            int cardWidth=Integer.parseInt((String) prop.get("cardWidth"));
+            int suitHeight=Integer.parseInt((String) prop.get("suitHeight"));
+            int suitWidth=Integer.parseInt((String) prop.get("suitWidth"));
+
+            BufferedReader cardBufferedReader = new BufferedReader(new InputStreamReader(classLoader.getResourceAsStream("templates/card.txt")));
+            BufferedReader suitBufferedReader = new BufferedReader(new InputStreamReader(classLoader.getResourceAsStream("templates/suit.txt")));
+
+            Map<int[][], String> cardTemplateMap = getTemplateMap(cardBufferedReader, cardHeight, cardWidth);
+            Map<int[][], String> suitTemplateMap = getTemplateMap(suitBufferedReader, suitHeight, suitWidth);
+
+            for (File file: filesInFolder) {
+                System.out.println(getCards(file,cardTemplateMap ,suitTemplateMap, cardHeight, cardWidth, suitHeight, suitWidth));
+            }
         }
         catch (Exception e){
-            System.out.println(e);
+            System.out.println("Задан неверный путь до папки с файлами! ");
         }
 
-        int cardHeight=Integer.parseInt((String) prop.get("cardHeight"));
-        int cardWidth=Integer.parseInt((String) prop.get("cardWidth"));
-        int suitHeight=Integer.parseInt((String) prop.get("suitHeight"));
-        int suitWidth=Integer.parseInt((String) prop.get("suitWidth"));
 
-        File cardFile = new File(classLoader.getResource("templates/card.txt").getFile());
-        File suitFile = new File(classLoader.getResource("templates/suit.txt").getFile());
-
-        Map<int[][], String> cardTemplateMap = getTemplateMap(cardFile, cardHeight, cardWidth);
-        Map<int[][], String> suitTemplateMap = getTemplateMap(suitFile, suitHeight, suitWidth);
-
-        for (File file: filesInFolder) {
-            System.out.println(getCards(file,cardTemplateMap ,suitTemplateMap, cardHeight, cardWidth, suitHeight, suitWidth));
-        }
     }
     //Метод читает из файла шаблона данные и преобразует их в Map
-    public static Map<int[][], String> getTemplateMap(File cardFile, int h, int w) {
+    public static Map<int[][], String> getTemplateMap(BufferedReader bufferedReader, int h, int w) {
 
         Map<int[][], String> cardTemplateMap = new HashMap<>();
         int[][] cardArray = new int[h][w];
-        try (BufferedReader reader = new BufferedReader(new FileReader(cardFile))){
+        try (BufferedReader reader = bufferedReader){
 
             String line = reader.readLine();
             int i=0;
@@ -75,7 +76,7 @@ public class Main {
         try {
             img = ImageIO.read(file);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Ошибка чтения файла!");
         }
         String nameCards = "";
         if (img!=null) {

@@ -1,7 +1,10 @@
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
+
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.Properties;
 
@@ -10,10 +13,10 @@ class MainTest {
     @Test
     void cardsAll() {
         ClassLoader classLoader = Main.class.getClassLoader();
-        File cardFile = new File(classLoader.getResource("templates/card.txt").getFile());
-        File suitFile = new File(classLoader.getResource("templates/suit.txt").getFile());
-        Map<int[][], String> cardTemplateMap = Main.getTemplateMap(cardFile, 20,20);
-        Map<int[][], String> suitTemplateMap = Main.getTemplateMap(suitFile, 24,30);
+        BufferedReader cardBufferedReader = new BufferedReader(new InputStreamReader(classLoader.getResourceAsStream("templates/card.txt")));
+        BufferedReader suitBufferedReader = new BufferedReader(new InputStreamReader(classLoader.getResourceAsStream("templates/suit.txt")));
+        Map<int[][], String> cardTemplateMap = Main.getTemplateMap(cardBufferedReader, 20,20);
+        Map<int[][], String> suitTemplateMap = Main.getTemplateMap(suitBufferedReader, 24,30);
 
         Properties prop = new Properties();
         try {
