@@ -50,13 +50,12 @@ public class Main {
             int i=0;
             while (line!=null){
                 String[] arrStr = line.split(" ");
-
-                if (arrStr.length>1){
+                if (arrStr.length>1){ //Если длина прочитанной из фала строки > 1 преобразуем в одномерный массив
                     int[] arr =  Arrays.asList(arrStr).stream().mapToInt(Integer::parseInt).toArray();
-                    cardArray[i]=arr;
+                    cardArray[i]=arr; //формируем двумерный массив из одномерных
                     i++;
-                } else {
-                    cardTemplateMap.put(cardArray,arrStr[0]);
+                } else { //если длина > 1 то перед нами достоинство либо масть карты из шаблона
+                    cardTemplateMap.put(cardArray,arrStr[0]); //записываем в map
                     cardArray=new int[h][w];
                     i=0;
                 }
@@ -78,36 +77,37 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        List<BufferedImage> cardImages = new ArrayList<BufferedImage>();
-        List<BufferedImage> suitImages = new ArrayList<BufferedImage>();
-        if (getColor(new Color(img.getRGB(151, 588))).equals("white")) //если в указанной точке белый фон то перед нами карта
-            cardImages.add(img.getSubimage(151, 593, cardWidth, cardHeight)); // задаем координаты достоинства карты
+        String nameCards = "";
+        if (img!=null) {
+            List<BufferedImage> cardImages = new ArrayList<BufferedImage>();
+            List<BufferedImage> suitImages = new ArrayList<BufferedImage>();
+            if (getColor(new Color(img.getRGB(151, 588))).equals("white")) //если в указанной точке белый фон то перед нами карта
+                cardImages.add(img.getSubimage(151, 593, cardWidth, cardHeight)); // задаем координаты достоинства карты
             suitImages.add(img.getSubimage(169, 641, suitWidth, suitHeight)); // задаем координаты масьи карты
-        if (getColor(new Color(img.getRGB(223, 588))).equals("white"))
-            cardImages.add(img.getSubimage(223, 593, cardWidth, cardHeight));
+            if (getColor(new Color(img.getRGB(223, 588))).equals("white"))
+                cardImages.add(img.getSubimage(223, 593, cardWidth, cardHeight));
             suitImages.add(img.getSubimage(241, 641, suitWidth, suitHeight));
-        if (getColor(new Color(img.getRGB(294, 588))).equals("white"))
-            cardImages.add(img.getSubimage(294, 593, cardWidth, cardHeight));
+            if (getColor(new Color(img.getRGB(294, 588))).equals("white"))
+                cardImages.add(img.getSubimage(294, 593, cardWidth, cardHeight));
             suitImages.add(img.getSubimage(312, 641, suitWidth, suitHeight));
-        if (getColor(new Color(img.getRGB(366, 588))).equals("white"))
-            cardImages.add(img.getSubimage(366, 593, cardWidth, cardHeight));
+            if (getColor(new Color(img.getRGB(366, 588))).equals("white"))
+                cardImages.add(img.getSubimage(366, 593, cardWidth, cardHeight));
             suitImages.add(img.getSubimage(384, 641, suitWidth, suitHeight));
-        if (getColor(new Color(img.getRGB(438, 588))).equals("white"))
-            cardImages.add(img.getSubimage(438, 593, cardWidth, cardHeight));
+            if (getColor(new Color(img.getRGB(438, 588))).equals("white"))
+                cardImages.add(img.getSubimage(438, 593, cardWidth, cardHeight));
             suitImages.add(img.getSubimage(456, 641, suitWidth, suitHeight));
 
-        String nameCards = "";
-        for (int k = 0; k < cardImages.size(); k++) {
-            BufferedImage card = cardImages.get(k);
-            BufferedImage suit = suitImages.get(k);
 
-            nameCards += recognize(card,cardTemplate) + recognize(suit, suitTemplate);
+            for (int k = 0; k < cardImages.size(); k++) {
+                BufferedImage card = cardImages.get(k);
+                BufferedImage suit = suitImages.get(k);
+
+                nameCards += recognize(card, cardTemplate) + recognize(suit, suitTemplate);
+            }
         }
-
-        return file.getName()+" - "+nameCards;
+        return file.getName()+" - "+(nameCards.equals("")?"Файл не распознан":nameCards);
     }
-//Метод возвращает наиболее подходящее из шаблона значение
+    //Метод возвращает наиболее похожее на img значение из шаблона
     private static String recognize(BufferedImage img, Map<int[][], String> map) {
         //преобразуем картинку в двумерный массив где 0 - фон 1 - значимый пиксель
         int[][] arr = new int[img.getHeight()][img.getWidth()];
@@ -132,7 +132,7 @@ public class Main {
                 for (int j = 0; j < img.getWidth(); j++) {
                     //System.out.print(arr[i][j]+" ");  Использовалось для печати шаблонов
                     if (currArr[i][j]!=arr[i][j])
-                        error++; // складываем ошибки полученные при сравнении массива из шаблона и картинки
+                        error++; // складываем ошибки полученные при сравнении массива из шаблона и  массива картинки из файла
                 }
                 //System.out.println("");  Использовалось для печати шаблонов
             }
@@ -140,10 +140,10 @@ public class Main {
 
             error=0;
         }
-        str= mapErrors.get(Collections.min(mapErrors.keySet())); // Возвращаем значение из map с ошибками с наименьшим количеством ошибок
+        str= mapErrors.get(Collections.min(mapErrors.keySet())); // Возвращаем значение из map с ошибками с наименьшим количеством ошибок, то есть наиболее схожее
         return str;
     }
-//метод возвращает цвет пикселя
+    //метод возвращает цвет пикселя
     public static String getColor(Color color){
 
         if ((color.getRed() == 255 && color.getGreen() == 255 && color.getBlue() == 255)|| // если карта активна
